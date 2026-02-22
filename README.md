@@ -56,7 +56,7 @@ Download all five of these files from this repo (specific to LSI3008) and put th
 4. Type ```dir``` to see the filesystem on that drive (Equivalent of using ```ls``` in Linux.). If you do not see the files you put on the USB drive, retry the previous commands beginning with ```map``` until you find the correct drive.
 5. Type: ```sas3flash.efi -list```
 &emsp;&emsp;&emsp;This shows the SAS Address as mentioned earlier. ENSURE TO TAKE A PICTURE OF THIS SCREEN AND RECORD THE SAS Address if you haven't already. 
-
+&emsp;&emsp;&emsp;![IRMODE](files/IRMODE.jpg)
 6. Type this command: ```sas3flash.efi -c 0 -o -e 6```. After it completes, the firmware currently on it will be cleared
 
 **You may get an error stating "Controller is not operational. A firmware download is required." Type ```quit``` to exit that prompt and continue with this guide.**
@@ -70,7 +70,7 @@ Download all five of these files from this repo (specific to LSI3008) and put th
 
 4. Lastly, type this command:```sas3flash.efi -list```
 - Verify that all information including the SAS Address are correct.
-
+&emsp;&emsp;&emsp;![ITMODE](files/ITMODE.jpg)
 ## 5. Complete!
 - You are now able to reboot the system and have completed this guide.
 
