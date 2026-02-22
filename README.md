@@ -1,27 +1,9 @@
-# Flash 9300-8i RAID Controller to IT Mode (HBA)
+# Flash LSI SAS 3008 TO IT MODE
 
-### A 9340-8i was used for this guide. Likely also compatible with IBM/Lenovo M1215 and SAS 3008 models, but have not tested them. This is not a guide for flashing to IR mode or from IR mode to IT mode.
+Guide for converting LSI SAS 3008 Controller from IR mode to IT mode, in order to run ZFS on a linux environment.
 
-This is an updated guide on how to flash IT mode firmware to your LSI/Avago/Broadcom 9300-8i RAID Controller. It is largely based on [this tutorial](https://www.servethehome.com/flash-lsi-sas-3008-hba-e-g-ibm-m1215-mode/) from 2016. Most of the screenshots and techniques used in this guide are from that tutorial and [others](#resources), but this repo compiles them, includes additional updated information/commentary, and makes all of the files used easily accessible.
+Adapted from original Github repository: https://github.com/EverLand1/9300-8i_IT-Mode , and combined with this video: https://www.youtube.com/watch?v=A54VuVNVX5M
 
-## Why would I want to flash my RAID controller?
-There are multiple reasons why you may want to flash your RAID controller to make it a Host Bus Adapter (HBA):
-- Using software RAID or filesystems including [ZFS](https://itsfoss.com/what-is-zfs/ "What is ZFS? - It's FOSS") and [BTRFS](https://itsfoss.com/btrfs/ "What is BTRFS - It's FOSS")
-- Avoiding RAID Limitations/Compatibility
-
-[Benefits of Using an HBA](https://www.truenas.com/community/resources/whats-all-the-noise-about-hbas-and-why-cant-i-use-a-raid-controller.139/)
-
-[(Video) RAID vs HBA SAS controllers](https://youtu.be/xEbQohy6v8U)
-
-[(Video) Hardware RAID Is Dead](https://www.youtube.com/watch?v=l55GfAwa8RI)
-
-### Warning: Before proceeding, do note that this is a risky process. Issues with firmware flashes can render your card “bricked” and unusable/unrecoverable. I will not be held responsible if this happens to your card. By following this guide, you accept all risks of damaging your card.
-
-## Required Items
-- Circuit Board Jumper Pin
-- USB Flash Drive
-- [Rufus Software](https://rufus.ie/en/ "Rufus")
-- Firmware Files (located in this repo)
 
 ## 1. Getting the Files
 Download all five of these files from this repo and put them on a USB drive. They are necessary for this guide.
@@ -30,18 +12,6 @@ Download all five of these files from this repo and put them on a USB drive. The
 - mptsas3.rom&emsp;        :&emsp;      Legacy BIOS OROM
 - mpt3x64.rom&emsp;        :&emsp;      UEFI BIOS OROM
 - sas3flash.efi&emsp;      :&emsp;      Flashing tool
-
-&emsp; _Note: Other tutorials aimed at flashing older models including 9200 models may use sas2flash.efi instead. The 9300 model does not work with sas2flash.efi and requires sas3flash.efi. This guide does not cover 9200 model controllers, but there is a detailed tutorial [here](https://www.servethehome.com/lsi-sas-2008-raid-controller-hba-information/)._
-- SAS9300_8i_IT.bin&emsp;  :&emsp;      IT Mode Firmware
-
-&emsp; _Note #1: There is a [reset bug](https://github.com/EverLand1/9300-8i_IT-Mode/issues/1) present in firmware versions below 16.00.12.00. Those earlier versions can lead to performance issues causing the controller to reset when using SATA HDDs. An updated version of the firmware has been added to this repo. The old firmware version (16.00.10.00) will still be located in this repo due to archival purposes and as another option for SAS HDD systems._
-
-Here is iX-System's description of the issue: 
-> Servers with the LSI 9300 HBA may experience some performance issues causing the controller to reset when using SATA HDDs.
-iXsystems has worked with Broadcom to provide a firmware update that resolves the controller reset issue. If you have the LSI 9300 HBA with firmware version 16.00.12.00 or earlier installed and would like to resolve the occasional controller reset from this issue, follow these instructions. Please note that the firmware update is only available from iXsystems.”
-**Please Note: This problem only applies to firmware versions below 16.00.12.00 and only affects SATA drives. SAS drives are not affected.**
-
-&emsp; _Note #2: Sometimes there can be trouble with using the "__" and "Shift" keys while in the UEFI shell. If any problems occur, change the name of this file to something without those characters and retry, adjusting the following commands accordingly._
 
 ## 2. Preparing the USB Drive
 1. To access the UEFI shell later on with the required files, you must format your USB flash drive into a bootable Free-DOS drive using Rufus. Launch Rufus, select the correct drive under **"Device"**, select **"Free-DOS"** under **"Boot Selection"**, and click **"Start"**. This should only take a couple seconds.
@@ -59,20 +29,7 @@ iXsystems has worked with Broadcom to provide a firmware update that resolves th
 
 &emsp;&emsp;&emsp;![USB Files](images/USB.png)
 
-## 3. Preparing the Adapter
-1. Put the jumper pin on the RAID controller pins. Make sure to put them on the correct pins as there may be multiple to choose from. 
-
-&emsp; _Note: I have seen several tutorials claim that this is not necessary. In my testing, however, I have not had success when using their methods, so this tutorial follows the approach of using a jumper pin. If you attempt to do it [that way](https://www.truenas.com/community/threads/how-to-flashing-lsi-sas-hba-controller-efi-uefi.78457/), please note that you must use slightly different commands. If you do not have success with that tutorial, you can fix it by beginning this guide from the beginning._
-
-### DO NOT TAKE THE JUMPER PIN OFF UNTIL AFTER THE SYSTEM POWERS DOWN AT THE END OF SECTION 5.
-
-&emsp;&emsp;&emsp;![Jumper Pin](images/jumper.jpg)
-
-2. Record the SAS Address of the controller. DO THIS NOW. This may involve taking apart the RAID controller in case it is hidden. However, that should only require a Phillips screwdriver. The sticker should look like this:
-
-&emsp;&emsp;&emsp;![SAS Address Sticker](images/sasaddress.jpg)
-
-## 4. Booting the Server into UEFI Shell
+## 3. Booting the Server into UEFI Shell
 
 1. Before powering on the machine, unplug any external drives that are on the system. This is not necessary, but it may make the process easier later.
 2. Next, plug in the USB drive.
@@ -98,13 +55,13 @@ iXsystems has worked with Broadcom to provide a firmware update that resolves th
 4. Type ```dir``` to see the filesystem on that drive (Equivalent of using ```ls``` in Linux.). If you do not see the files you put on the USB drive, retry the previous commands beginning with ```map``` until you find the correct drive.
 5. Type: ```sas3flash.efi -list```
 
-&emsp;&emsp;&emsp;This shows the SAS Address as mentioned earlier. Record the SAS Address if you haven't already. 
+&emsp;&emsp;&emsp;This shows the SAS Address as mentioned earlier. ENSURE TO TAKE A PICTURE OF THIS SCREEN AND RECORD THE SAS Address if you haven't already. 
 
 **You may get an error stating "Controller is not operational. A firmware download is required." Type ```quit``` to exit that prompt and continue with this guide.**
 
 &emsp;![List](images/list.png)
 
-6. Type this command: ```sas3flash.efi -f SAS9300_8i_IT.bin -noreset```. After it completes, power down the system and take the jumper pin off of the RAID controller.
+6. Type this command: ```sas3flash.efi -c 0 -o -e 5```. After it completes, the firmware currently on it will be cleared
 
 &emsp;&emsp;&emsp;This erases the running flash/bios on the RAID controller. 
 
@@ -112,27 +69,20 @@ iXsystems has worked with Broadcom to provide a firmware update that resolves th
 
 ## 6. Flashing the Controller
 1. Boot back into the UEFI shell through the USB drive.
-2. Type this command: ```sas3flash.efi -o -e 7```
+2. Type this command: ```sas3flash.efi -o -e 6```
 
-- Erases the card's NVRAM
 
 &emsp;![Erase](images/erase.jpg)
 
-3. Next, type: ```sas3flash.efi -f SAS9300_8i_IT.bin -b mptsas3.rom -b mpt3x64.rom```
+3. Next, type: ```sas3flash.efi -c 0 -o -f SAS9300_8i_IT.bin -b mptsas3.rom -b mpt3x64.rom
 - This flashes the new UEFI and Legacy BIOS firmware with ROM
 
 &emsp;![Flash Firmware](images/flash.jpg)
 
-4. Type: ```sas3flash.efi -o -sasadd XXXXXXXXXXXXXXXXX```
-- Here, replace the X's with your SAS Address. DO NOT USE HYPENS, SPACES, ETC.
-- This  flashes the SAS Address back onto the HBA
-
-&emsp;![SASADD](images/sasadd.jpg)
-
-5. Lastly, type this command:```sas3flash.efi -list```
+4. Lastly, type this command:```sas3flash.efi -list```
 - Verify that all information including the SAS Address are correct.
 
-## 6. Complete!
+## 5. Complete!
 - You are now able to reboot the system and have completed this guide.
 
 &emsp;&emsp; - Command in UEFI shell: ```reset```
