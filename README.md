@@ -49,36 +49,24 @@ Download all five of these files from this repo (specific to LSI3008) and put th
 5. Save these changes and restart the system.
 6. Boot to the USB drive. If possible, you can access the boot menu during startup similarly to the BIOS menu. However, you can also go back to the BIOS menu and change the boot sequence to make the UEFI USB Drive the first device the system boots to upon startup. You will now be able to boot to the USB.
 
-## 5. Resetting the Adapter
+## 4. Resetting the Adapter
 1. You should find yourself at a ```Shell>``` command line prompt. If you are experienced with using the terminal or are adventerous, here are some interesting [commands](https://manuais.iessanclemente.net/images/a/a6/EFI-ShellCommandManual.pdf) you can play around with while in this shell.
 2. Now, to find all available drives on the system, type ```map```. This may already show up when you are first brought into the shell.
 3. Your USB drive should be named something along the lines of "Removable Hard Disk". If not, choose the first drive that shows up first. Mount to the alias of that drive. For example, if the drive is named ```fs0```, type ```fs0:``` (remember the colon). Your terminal prompt should now read ```fs0:\>``` as you have successfully mounted the drive.
 4. Type ```dir``` to see the filesystem on that drive (Equivalent of using ```ls``` in Linux.). If you do not see the files you put on the USB drive, retry the previous commands beginning with ```map``` until you find the correct drive.
 5. Type: ```sas3flash.efi -list```
-
 &emsp;&emsp;&emsp;This shows the SAS Address as mentioned earlier. ENSURE TO TAKE A PICTURE OF THIS SCREEN AND RECORD THE SAS Address if you haven't already. 
+
+6. Type this command: ```sas3flash.efi -c 0 -o -e 6```. After it completes, the firmware currently on it will be cleared
 
 **You may get an error stating "Controller is not operational. A firmware download is required." Type ```quit``` to exit that prompt and continue with this guide.**
 
-&emsp;![List](images/list.png)
-
-6. Type this command: ```sas3flash.efi -c 0 -o -e 5```. After it completes, the firmware currently on it will be cleared
-
 &emsp;&emsp;&emsp;This erases the running flash/bios on the RAID controller. 
 
-&emsp;&emsp;![Noreset](images/noreset.jpg)
-
-## 6. Flashing the Controller
-1. Boot back into the UEFI shell through the USB drive.
-2. Type this command: ```sas3flash.efi -o -e 6```
-
-
-&emsp;![Erase](images/erase.jpg)
 
 3. Next, type: ```sas3flash.efi -c 0 -o -f SAS9300_8i_IT.bin -b mptsas3.rom -b mpt3x64.rom
 - This flashes the new UEFI and Legacy BIOS firmware with ROM
 
-&emsp;![Flash Firmware](images/flash.jpg)
 
 4. Lastly, type this command:```sas3flash.efi -list```
 - Verify that all information including the SAS Address are correct.
