@@ -11,6 +11,7 @@ Download all five of these files from this repo (specific to LSI3008) and put th
 - bootx64.efi&emsp;        :&emsp;      UEFI Shell Boot File
 - mptsas3.rom&emsp;        :&emsp;      Legacy BIOS OROM (LSI3008 version)
 - mpt3x64.rom&emsp;        :&emsp;      UEFI BIOS OROM (LSI3008 version)
+- SAS9300_8i_IT.bin&emsp;    :&emsp;      IT Firmware Version (LSI3008 version)
 - sas3flash.efi&emsp;      :&emsp;      Flashing tool
 
 ## 2. Preparing the USB Drive
